@@ -4,34 +4,51 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import {LMap, LTileLayer, LTooltip, LMarker, LIcon} from "@vue-leaflet/vue-leaflet";
 import {computed, reactive, ref} from "vue";
 
+const props = defineProps({
+    gameId: Number,
+    tokens: Array,
+})
+
+const tokens = reactive([]);
+
+for (const token of props.tokens) {
+    tokens.push({
+        id: token.id,
+        name: token.name,
+        latitude: token.latitude,
+        longitude: token.longitude,
+        image: token.image,
+        isDragging: false
+    });
+}
+
 const zoom = ref(2);
 const iconSize = ref(64)
 
 const dynamicSize = computed(() => [iconSize.value, iconSize.value * 1.15])
 const dynamicAnchor = computed(() => [iconSize.value / 2, iconSize.value * 1.15])
 
-const xy = reactive({x: 0, y: 0})
+const updateLatLong = (token, latLng) => {
+    if (token.latitude === latLng.lat && token.longitude === latLng.lng) return;
 
-const isDragging = ref(false);
+    token.latitude = latLng.lat;
+    token.longitude = latLng.lng;
 
-const updateLatLong = (latLng, force = false) => {
-    if (latLng != null && xy.y === latLng.lat && xy.x === latLng.lng && !force) return;
+    if (token.isDragging === true) return; // Pour check si c'est en train d'etre drag-drop
 
-    if (!force) {
-        xy.y = latLng.lat;
-        xy.x = latLng.lng;
-
-        if (isDragging.value === true) return; // Pour check si c'est en train d'etre drag-drop
-    }
-
-    axios.post('/games/1/tokens/1/move', {x: xy.x, y: xy.y}).
+    axios.post(`/games/${props.gameId}/tokens/${token.id}/move`, {longitude: token.longitude, latitude: token.latitude}).
         then((resp) => console.log(resp)).catch(err => console.log(err));
 }
 
 window.Echo.private(`Game.1`)
     .listen(`.token.moved`, (e) => {
-        xy.x = e.x;
-        xy.y = e.y;
+        console.log(e);
+        for (const token of tokens) {
+            if (token.id === e.tokenId) {
+                token.latitude = e.latitude;
+                token.longitude = e.longitude;
+            }
+        }
     });
 
 </script>
@@ -44,18 +61,18 @@ window.Echo.private(`Game.1`)
             </h2>
         </template>
 
-        <div class="container w-full h-[70vh] mx-auto ">
+        <div class="w-full h-[70vh] mx-auto ">
             <l-map ref="map" :zoom="zoom" :center="[47.41322, -1.219482]">
                 <l-tile-layer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     layer-type="base"
                     name="OpenStreetMap"
                 ></l-tile-layer>
-                <l-marker :lat-lng="[xy.y, xy.x]" draggable @update:latLng="updateLatLong($event)" @dragstart="isDragging = true" @dragend="isDragging = false; updateLatLong(null, true)">
+                <l-marker v-for="token in tokens" :lat-lng="[token.latitude, token.longitude]" draggable @update:latLng="updateLatLong(token, $event)" @dragstart="token.isDragging = true" @dragend="token.isDragging = false; updateLatLong(token, {lng: token.longitude, lat: token.latitude})">
                     <l-icon
                         :icon-size="dynamicSize"
                         :icon-anchor="dynamicAnchor"
-                        icon-url="https://cdn-icons-png.flaticon.com/512/2492/2492773.png"
+                        :icon-url="token.image"
                     />
                     <l-tooltip>
                         Token 1
@@ -63,9 +80,7 @@ window.Echo.private(`Game.1`)
                 </l-marker>
             </l-map>
         </div>
-        <div class="container w-full h-[70vh] mx-auto ">
 
-        </div>
 
     </AppLayout>
 </template>
