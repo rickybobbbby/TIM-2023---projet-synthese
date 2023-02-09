@@ -17,11 +17,10 @@ use Inertia\Inertia;
 
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'home']);
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::group('/game/{id}')
 });
