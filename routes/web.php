@@ -22,5 +22,19 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(fun
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::group('/game/{id}')
+    Route::prefix('/games')->group(function() {
+
+        // Routes pertaining to a specific game
+        Route::prefix('/{game}')->group(function() {
+
+            // Token routes
+            Route::prefix('/tokens')->group(function() {
+
+                // Routes pertaining to a specific token
+                 Route::prefix('/{token}')->group(function() {
+                     Route::post('/move', [\App\Http\Controllers\Games\TokenController::class, 'move']);
+                 });
+            });
+        });
+    });
 });

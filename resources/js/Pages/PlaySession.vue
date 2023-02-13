@@ -2,7 +2,7 @@
 import {Head, Link} from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {LMap, LTileLayer, LTooltip, LMarker, LIcon} from "@vue-leaflet/vue-leaflet";
-import {computed, ref} from "vue";
+import {computed, reactive, ref} from "vue";
 
 const zoom = ref(2);
 const iconSize = ref(64)
@@ -10,9 +10,29 @@ const iconSize = ref(64)
 const dynamicSize = computed(() => [iconSize.value, iconSize.value * 1.15])
 const dynamicAnchor = computed(() => [iconSize.value / 2, iconSize.value * 1.15])
 
-const log = (a) => {
-    console.log(a)
+const xy = reactive({x: 0, y: 0})
+
+const isDragging = ref(false);
+
+const updateLatLong = (latLng, force = false) => {
+    if (latLng != null && xy.y === latLng.lat && xy.x === latLng.lng && !force) return;
+
+    if (!force) {
+        xy.y = latLng.lat;
+        xy.x = latLng.lng;
+
+        if (isDragging.value === true) return; // Pour check si c'est en train d'etre drag-drop
+    }
+
+    axios.post('/games/1/tokens/1/move', {x: xy.x, y: xy.y}).
+        then((resp) => console.log(resp)).catch(err => console.log(err));
 }
+
+window.Echo.private(`Game.1`)
+    .listen(`.token.moved`, (e) => {
+        xy.x = e.x;
+        xy.y = e.y;
+    });
 
 </script>
 
@@ -25,17 +45,17 @@ const log = (a) => {
         </template>
 
         <div class="container w-full h-[70vh] mx-auto ">
-            <l-map ref="map" v-model:zoom="zoom" :center="[47.41322, -1.219482]">
+            <l-map ref="map" :zoom="zoom" :center="[47.41322, -1.219482]">
                 <l-tile-layer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     layer-type="base"
                     name="OpenStreetMap"
                 ></l-tile-layer>
-                <l-marker :lat-lng="[0, 0]" draggable @moveend="log('moveend')">
+                <l-marker :lat-lng="[xy.y, xy.x]" draggable @update:latLng="updateLatLong($event)" @dragstart="isDragging = true" @dragend="isDragging = false; updateLatLong(null, true)">
                     <l-icon
                         :icon-size="dynamicSize"
                         :icon-anchor="dynamicAnchor"
-                        icon-url="/static/images/baseball-marker.png"
+                        icon-url="https://cdn-icons-png.flaticon.com/512/2492/2492773.png"
                     />
                     <l-tooltip>
                         Token 1
@@ -43,5 +63,9 @@ const log = (a) => {
                 </l-marker>
             </l-map>
         </div>
+        <div class="container w-full h-[70vh] mx-auto ">
+
+        </div>
+
     </AppLayout>
 </template>
