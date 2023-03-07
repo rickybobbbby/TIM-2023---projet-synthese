@@ -2,8 +2,12 @@
 
 namespace App\Http\Requests\Game;
 
+use App\Models\Game;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property Game $game
+ */
 class GameUpdateRequest extends FormRequest
 {
     /**
@@ -11,11 +15,10 @@ class GameUpdateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        $r = new \ReflectionClass($this);
-        $r->getAttributes('game');
-        return false;
+        return $this->user() != null
+            && $this->user()->can('update', $this->game);
     }
 
     /**
@@ -26,7 +29,7 @@ class GameUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'required|string|min:3',
         ];
     }
 }

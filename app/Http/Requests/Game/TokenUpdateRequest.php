@@ -2,8 +2,14 @@
 
 namespace App\Http\Requests\Game;
 
+use App\Models\Game;
+use App\Models\Token;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property Game $game
+ * @property Token $token
+ */
 class TokenUpdateRequest extends FormRequest
 {
     /**
@@ -11,9 +17,9 @@ class TokenUpdateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('update', $this->token);
     }
 
     /**
@@ -24,7 +30,17 @@ class TokenUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'file' => 'sometimes|image|mimes:jpg,bmp,png',
+            'name' => 'sometimes|string|min:3',
+            'user_id' => [
+                'sometimes',
+
+                // The user ID must be in the player list
+                function ($attribute, $value, $fail) {
+                    if (!$this->game->players()->where('id', $value)->exists())
+                        $fail('That user is not part of the game.');
+                }
+            ],
         ];
     }
 }

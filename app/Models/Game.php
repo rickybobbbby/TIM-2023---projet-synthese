@@ -17,9 +17,20 @@ class Game extends Model
         'name',
     ];
 
+    protected $visible = [
+        'id',
+        'name',
+        'owner_id',
+    ];
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class);
     }
 
     public function tokens(): HasMany
@@ -29,11 +40,20 @@ class Game extends Model
 
     public function players(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'player');
+        return $this->belongsToMany(User::class, 'players')
+            ->using(Player::class)
+            ->as('player')
+            ->withPivot(['id']);
+    }
+
+    public function invites(): HasMany
+    {
+        return $this->hasMany(GameInvitation::class);
     }
 
     public function hasUserJoined(User $user): bool
     {
         return $this->players()->where('user_id', $user->id)->exists();
     }
+
 }

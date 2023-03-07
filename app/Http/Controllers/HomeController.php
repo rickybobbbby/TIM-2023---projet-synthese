@@ -11,16 +11,8 @@ class HomeController extends Controller
 {
     public function home()
     {
-        if (auth()->guest()) {
-            return Inertia::render('Welcome', [
-                'canLogin' => Route::has('login'),
-                'canRegister' => Route::has('register'),
-                'laravelVersion' => Application::VERSION,
-                'phpVersion' => PHP_VERSION,
-            ]);
-        }
-
-        // Sinon afficher d'autre chose
-        return Inertia::render('PlaySession');
+        return redirect()->route(
+            auth()->guest() ? 'login' : 'dashboard'
+        );
     }
 }

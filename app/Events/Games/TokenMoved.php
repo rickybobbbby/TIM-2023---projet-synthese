@@ -2,6 +2,8 @@
 
 namespace App\Events\Games;
 
+use App\Models\Game;
+use App\Models\Token;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -16,7 +18,7 @@ class TokenMoved implements ShouldBroadcastNow
      *
      * @return void
      */
-    public function __construct(protected $game, protected $token, protected $x, protected $y)
+    public function __construct(protected Game $game, protected Token $token, protected $longitude, protected $latitude)
     {
         $this->broadcastVia('pusher');
     }
@@ -28,12 +30,17 @@ class TokenMoved implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('Game.' . $this->game);
+        return new PrivateChannel('Game.' . $this->game->id);
     }
 
     public function broadcastWith(): array
     {
-        return ['game' => $this->game, 'token' => $this->token, 'x' => $this->x, 'y' => $this->y];
+        return [
+            'gameId' => $this->game->id,
+            'tokenId' => $this->token->id,
+            'longitude' => $this->longitude,
+            'latitude' => $this->latitude
+        ];
     }
 
     public function broadcastAs(): string

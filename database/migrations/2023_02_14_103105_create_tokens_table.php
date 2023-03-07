@@ -26,7 +26,7 @@ return new class extends Migration {
                 ->nullOnDelete();
 
             $table->string('name');
-            $table->string('image')->nullable();
+            $table->string('filename')->nullable();
 
             $table->integer('latitude')->default(0);
             $table->integer('longitude')->default(0);

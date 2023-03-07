@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -59,4 +61,23 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    protected static function booting()
+    {
+        parent::booting();
+
+        // Making sure the emails are stored in lowercase
+        static::creating(fn(User $user) => $user->email = strtolower($user->email));
+        static::updating(fn(User $user) => $user->email = strtolower($user->email));
+    }
+
+    public function joinedGames(): BelongsToMany
+    {
+        return $this->belongsToMany(Game::class, 'player');
+    }
+
+    public function pendingInvitations(): array
+    {
+        return GameInvitation::where('email', $this->email)->get();
+    }
 }

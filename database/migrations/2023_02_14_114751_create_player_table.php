@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('player', function (Blueprint $table) {
+        Schema::create('players', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\Game::class)->index()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(\App\Models\User::class)->index()->constrained()->cascadeOnDelete();

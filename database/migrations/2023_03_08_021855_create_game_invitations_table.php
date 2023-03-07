@@ -15,7 +15,11 @@ return new class extends Migration
     {
         Schema::create('game_invitations', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(\App\Models\Game::class)->constrained()->cascadeOnDelete();
+            $table->string('email')->index();
             $table->timestamps();
+
+            $table->unique(['game_id', 'email']);
         });
     }
 

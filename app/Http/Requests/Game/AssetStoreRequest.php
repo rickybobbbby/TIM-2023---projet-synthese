@@ -3,7 +3,11 @@
 namespace App\Http\Requests\Game;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Game;
 
+/**
+ * @property Game $game
+ */
 class AssetStoreRequest extends FormRequest
 {
     /**
@@ -11,9 +15,10 @@ class AssetStoreRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return false;
+        return $this->user() != null
+            && $this->user()->can('update', $this->game);
     }
 
     /**
@@ -24,7 +29,7 @@ class AssetStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'file' => 'required|image|mimes:jpg,bmp,png'
         ];
     }
 }

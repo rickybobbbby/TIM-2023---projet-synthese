@@ -15,6 +15,20 @@ return new class extends Migration
     {
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(\App\Models\Game::class, 'game_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            // Filename without path
+            $table->string('filename');
+
+            // Width and height of the image
+            $table->unsignedInteger('width');
+            $table->unsignedInteger('height');
+
+            // Positions on the grid
+            $table->unsignedInteger('longitude')->nullable();
+            $table->unsignedInteger('latitude')->nullable();
             $table->timestamps();
         });
     }
