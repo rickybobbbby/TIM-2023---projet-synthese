@@ -12,6 +12,7 @@ class AssetController extends Controller
     public function store(AssetStoreRequest $request, Game $game)
     {
         list($w, $h) = getimagesize($request->file('file')->path());
+
         $game->assets()->create([
             ...$request->safe()->except('file'),
             'width' => $w,
