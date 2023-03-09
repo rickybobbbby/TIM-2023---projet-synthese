@@ -1,7 +1,6 @@
 <script setup>
-import {Head, Link} from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import {LMap, LTileLayer, LTooltip, LMarker, LIcon, LImageOverlay} from "@vue-leaflet/vue-leaflet";
+import {LMap, LTooltip, LMarker, LIcon, LImageOverlay} from "@vue-leaflet/vue-leaflet";
 import {computed, onBeforeUnmount, onMounted, reactive, ref} from "vue";
 
 import GameSettings from "./Partials/GameSettings.vue";
@@ -118,7 +117,7 @@ onBeforeUnmount(() => {
                         :icon-url="token.url"
                     />
                     <l-tooltip>
-                        Token 1
+                        token
                     </l-tooltip>
                 </l-marker>
             </l-map>
