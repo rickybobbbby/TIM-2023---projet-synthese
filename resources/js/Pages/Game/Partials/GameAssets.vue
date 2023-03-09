@@ -200,11 +200,18 @@ const team = [
                                                                         aria-hidden="true"/>
                                                                     <div
                                                                         class="relative flex min-w-0 flex-1 items-center">
+                                                                        <span class="relative inline-block flex-shrink-0">
+                                                                            <img class="h-10 w-10 rounded-full" :src="person.imageUrl"
+                                                                                 alt=""/>
+                                                                            <span
+                                                                                :class="[person.status === 'online' ? 'bg-green-400' : 'bg-gray-300', 'absolute top-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white']"
+                                                                                aria-hidden="true"/>
+                                                                        </span>
                                                                         <div class="ml-4 truncate">
                                                                             <p class="truncate text-sm font-medium text-noir-100">
-                                                                                token1</p>
+                                                                                {{ person.name }}</p>
                                                                             <p class="truncate text-sm text-noir-300">
-                                                                               token added by yannick</p>
+                                                                                {{ '@' + person.handle }}</p>
                                                                         </div>
                                                                     </div>
                                                                 </a>
