@@ -209,9 +209,9 @@ const team = [
                                                                         </span>
                                                                         <div class="ml-4 truncate">
                                                                             <p class="truncate text-sm font-medium text-noir-100">
-                                                                                {{ person.name }}</p>
+                                                                               Token 1</p>
                                                                             <p class="truncate text-sm text-noir-300">
-                                                                                {{ '@' + person.handle }}</p>
+                                                                               Control by Yannick</p>
                                                                         </div>
                                                                     </div>
                                                                 </a>
